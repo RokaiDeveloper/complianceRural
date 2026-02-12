@@ -15,7 +15,7 @@ public interface RelatorioRepository extends JpaRepository<Relatorio, Long> {
     
     List<Relatorio> findByAtividadeId(Long atividadeId);
     
-    @Query("SELECT r FROM relatorio r WHERE r.usuarioId = :usuarioId AND r.atividadeId = :atividadeId")
+    @Query("SELECT r FROM Relatorio r WHERE r.usuarioId = :usuarioId AND r.atividadeId = :atividadeId")
     List<Relatorio> findByUsuarioIdAndAtividadeId(@Param("usuarioId") Long usuarioId,
                                                   @Param("atividadeId") Long atividadeId);
 }
