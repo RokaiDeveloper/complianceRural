@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/atividades")
@@ -43,6 +44,16 @@ public class AtividadeController {
             return atividadeService.findAll();
         } catch (Exception e) {
             throw new RuntimeException("Failed to find all atividades", e);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public Atividade findById(@PathVariable Long id) {
+        try {
+            return atividadeService.findById(id)
+                .orElseThrow(() -> new RuntimeException("Atividade não encontrada com ID: " + id));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to find atividade by id: " + id, e);
         }
     }
 }
