@@ -3,9 +3,12 @@ package com.system.unipar.controller;
 import com.system.unipar.dto.AtividadeRequisitoItemDTO;
 import com.system.unipar.model.AtividadeRequisitoItem;
 import com.system.unipar.service.AtividadeRequisitoItemService;
+import com.system.unipar.service.AtividadeRequisitoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -17,15 +20,37 @@ public class AtividadeRequisitoItemController {
     @Autowired
     private AtividadeRequisitoItemService atividadeRequisitoItemService;
 
-    @PostMapping
-    public AtividadeRequisitoItem save(@RequestBody AtividadeRequisitoItemDTO atividadeRequisitoItemDTO) {
-        if (atividadeRequisitoItemDTO == null) {
-            throw new IllegalArgumentException("AtividadeRequisitoItemDTO cannot be null");
-        }
+    @Autowired
+    private AtividadeRequisitoService atividadeRequisitoService;
 
+    @PostMapping
+    public AtividadeRequisitoItem save(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("atividadeRequisitoId") Long atividadeRequisitoId,
+            @RequestParam("relatorioId") Long relatorioId,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "observacao", required = false) String observacao) {
+        
         try {
-            AtividadeRequisitoItem atividadeRequisitoItem = getAtividadeRequisitoItem(atividadeRequisitoItemDTO);
-            AtividadeRequisitoItem saved = atividadeRequisitoItemService.save(atividadeRequisitoItem);
+            if (file.isEmpty()) {
+                throw new IllegalArgumentException("Arquivo não pode ser vazio");
+            }
+
+            // Validar se AtividadeRequisito existe
+            if (!atividadeRequisitoService.existsById(atividadeRequisitoId)) {
+                throw new IllegalArgumentException("Atividade Requisito não encontrado com ID: " + atividadeRequisitoId);
+            }
+
+            AtividadeRequisitoItem item = new AtividadeRequisitoItem();
+            item.setAtividadeRequisitoId(atividadeRequisitoId);
+            item.setRelatorioId(relatorioId);
+            item.setDocumento(file.getBytes()); // Converte MultipartFile para byte[]
+            item.setDataDocumento(new Date());
+            item.setStatus(status != null ? status : "PENDENTE");
+            item.setObservacao(observacao);
+            item.setChecked(true);
+
+            AtividadeRequisitoItem saved = atividadeRequisitoItemService.save(item);
 
             if (saved == null || saved.getId() == null) {
                 throw new RuntimeException("Failed to save atividade requisito item - no ID returned");
@@ -56,6 +81,25 @@ public class AtividadeRequisitoItemController {
         }
     }
 
+    @GetMapping("/{id}/documento")
+    public Map<String, Object> getDocumento(@PathVariable Long id) {
+        try {
+            AtividadeRequisitoItem item = atividadeRequisitoItemService.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Atividade requisito item não encontrado com ID: " + id));
+            
+            byte[] documento = item.getDocumento();
+            if (documento == null) {
+                return Map.of("documento", (String) null);
+            }
+            
+            // Converte byte[] para Base64
+            String base64 = Base64.getEncoder().encodeToString(documento);
+            return Map.of("documento", base64);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get documento for id: " + id, e);
+        }
+    }
+
     @PutMapping("/{id}")
     public AtividadeRequisitoItem update(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
         if (payload == null) {
@@ -83,7 +127,16 @@ public class AtividadeRequisitoItemController {
                 existingItem.setObservacao((String) payload.get("observacao"));
             }
             if (payload.containsKey("documento")) {
-                existingItem.setDocumento((byte[]) payload.get("documento"));
+                String documentoStr = (String) payload.get("documento");
+                if (documentoStr != null && !documentoStr.isEmpty()) {
+                    try {
+                        // Remove prefixo Base64 se existir
+                        String base64Clean = documentoStr.replaceFirst("^data:[^;]+;base64,", "");
+                        existingItem.setDocumento(Base64.getDecoder().decode(base64Clean));
+                    } catch (IllegalArgumentException e) {
+                        throw new IllegalArgumentException("Formato de documento inválido. Use Base64 válido.");
+                    }
+                }
             }
 
             AtividadeRequisitoItem updated = atividadeRequisitoItemService.save(existingItem);
