@@ -26,6 +26,16 @@ public class AtividadeRequisitoItemController {
     @Autowired
     private AtividadeRequisitoService atividadeRequisitoService;
 
+
+    @GetMapping
+    public List<AtividadeRequisitoItem> findAll() {
+        try {
+         return atividadeRequisitoItemService.findAll();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve atividade requisito item", e);
+        }
+    }
+
     @PostMapping
     @Transactional
     public AtividadeRequisitoItem save(
