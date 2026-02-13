@@ -32,7 +32,7 @@ public class AtividadeRequisitoItem {
     private Date dataDocumento;
 
     @Column(name = "checked", nullable = true, columnDefinition = "boolean default true")
-    private boolean check;
+    private boolean checked;
 
     @Column(name = "status", nullable = true)
     private String status;
