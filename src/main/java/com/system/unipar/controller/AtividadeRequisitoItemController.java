@@ -65,7 +65,13 @@ public class AtividadeRequisitoItemController {
     @GetMapping("/relatorio/{relatorioId}")
     public List<AtividadeRequisitoItem> findByRelatorioId(@PathVariable Long relatorioId) {
         try {
-            return atividadeRequisitoItemService.findByRelatorioId(relatorioId);
+            System.out.println("=== DEBUG: Buscando itens para relatorioId = " + relatorioId);
+            List<AtividadeRequisitoItem> items = atividadeRequisitoItemService.findByRelatorioId(relatorioId);
+            System.out.println("=== DEBUG: Encontrados " + items.size() + " itens");
+            for (AtividadeRequisitoItem item : items) {
+                System.out.println("=== DEBUG: Item ID=" + item.getId() + ", relatorioId=" + item.getRelatorioId());
+            }
+            return items;
         } catch (Exception e) {
             throw new RuntimeException("Failed to find atividade requisito items by relatorio id: " + relatorioId, e);
         }
