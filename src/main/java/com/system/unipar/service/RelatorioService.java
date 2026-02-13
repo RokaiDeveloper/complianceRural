@@ -44,4 +44,15 @@ public class RelatorioService {
     public List<Relatorio> buscarPorUsuarioIdEAtividadeId(Long usuarioId, Long atividadeId) {
         return relatorioRepository.findByUsuarioIdAndAtividadeId(usuarioId, atividadeId);
     }
+
+    public Relatorio atualizarStatus(Long id, String status) {
+        Optional<Relatorio> relatorioOpt = relatorioRepository.findById(id);
+        if (relatorioOpt.isEmpty()) {
+            throw new RuntimeException("Relatório não encontrado com ID: " + id);
+        }
+        Relatorio relatorio = relatorioOpt.get();
+        // Apenas atualiza o status, mantendo os outros campos intactos
+        relatorio.setStatus(status);
+        return relatorioRepository.save(relatorio);
+    }
 }

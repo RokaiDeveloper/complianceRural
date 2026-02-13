@@ -60,4 +60,16 @@ public class RelatorioController {
         List<Relatorio> relatorios = relatorioService.buscarPorUsuarioIdEAtividadeId(usuarioId, atividadeId);
         return ResponseEntity.ok(relatorios);
     }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<Relatorio> atualizarStatus(
+            @PathVariable Long id, 
+            @RequestBody String status) {
+        try {
+            Relatorio atualizado = relatorioService.atualizarStatus(id, status);
+            return ResponseEntity.ok(atualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
