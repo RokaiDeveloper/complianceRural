@@ -1,10 +1,12 @@
 package com.system.unipar.controller;
 
 import com.system.unipar.dto.AtividadeRequisitoItemDTO;
+import com.system.unipar.dto.AtividadeRequisitoItemSemDocumentoDTO;
 import com.system.unipar.model.AtividadeRequisitoItem;
 import com.system.unipar.service.AtividadeRequisitoItemService;
 import com.system.unipar.service.AtividadeRequisitoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,6 +14,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/atividade-requisito-item")
@@ -24,6 +27,7 @@ public class AtividadeRequisitoItemController {
     private AtividadeRequisitoService atividadeRequisitoService;
 
     @PostMapping
+    @Transactional
     public AtividadeRequisitoItem save(
             @RequestParam("file") MultipartFile file,
             @RequestParam("atividadeRequisitoId") Long atividadeRequisitoId,
@@ -63,9 +67,14 @@ public class AtividadeRequisitoItemController {
     }
 
     @GetMapping("/relatorio/{relatorioId}")
-    public List<AtividadeRequisitoItem> findByRelatorioId(@PathVariable Long relatorioId) {
+    @Transactional(readOnly = true)
+    public List<AtividadeRequisitoItemSemDocumentoDTO> findByRelatorioId(@PathVariable Long relatorioId) {
         try {
-            return atividadeRequisitoItemService.findByRelatorioId(relatorioId);
+            List<AtividadeRequisitoItem> items = atividadeRequisitoItemService.findByRelatorioId(relatorioId);
+            
+            return items.stream()
+                    .map(this::toSemDocumentoDTO)
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             throw new RuntimeException("Failed to find atividade requisito items by relatorio id: " + relatorioId, e);
         }
@@ -82,6 +91,7 @@ public class AtividadeRequisitoItemController {
     }
 
     @GetMapping("/{id}/documento")
+    @Transactional(readOnly = true)
     public Map<String, Object> getDocumento(@PathVariable Long id) {
         try {
             AtividadeRequisitoItem item = atividadeRequisitoItemService.findById(id)
@@ -157,6 +167,18 @@ public class AtividadeRequisitoItemController {
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete atividade requisito item with id: " + id, e);
         }
+    }
+
+    private AtividadeRequisitoItemSemDocumentoDTO toSemDocumentoDTO(AtividadeRequisitoItem item) {
+        return AtividadeRequisitoItemSemDocumentoDTO.builder()
+                .id(item.getId())
+                .atividadeRequisitoId(item.getAtividadeRequisitoId())
+                .dataDocumento(item.getDataDocumento())
+                .checked(item.isChecked())
+                .status(item.getStatus())
+                .relatorioId(item.getRelatorioId())
+                .observacao(item.getObservacao())
+                .build();
     }
 
     private static AtividadeRequisitoItem getAtividadeRequisitoItem(AtividadeRequisitoItemDTO dto) {

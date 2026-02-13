@@ -24,7 +24,7 @@ public class AtividadeRequisitoItem {
     @Column(name = "atividade_requisito_id")
     private Long atividadeRequisitoId;
 
-    @Basic
+    @Lob
     @Column(name = "documento", nullable = true)
     private byte[] documento;
 
