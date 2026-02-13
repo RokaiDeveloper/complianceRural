@@ -173,6 +173,19 @@ public class AtividadeRequisitoItemService {
         }
     }
 
+    public List<AtividadeRequisitoItem> findByUsuarioId(Long usuarioId) {
+        try {
+            if (usuarioId == null || usuarioId <= 0) {
+                logger.warning("ID de usuário inválido fornecido: " + usuarioId);
+                return List.of();
+            }
+            return atividadeRequisitoItemRepository.findByUsuarioId(usuarioId);
+        } catch (DataAccessException e) {
+            logger.log(Level.SEVERE, "Erro ao buscar itens por usuário ID: " + usuarioId, e);
+            return List.of();
+        }
+    }
+
     private boolean validateRelationships(AtividadeRequisitoItem item) {
         try {
             if (item.getAtividadeRequisitoId() != null && 

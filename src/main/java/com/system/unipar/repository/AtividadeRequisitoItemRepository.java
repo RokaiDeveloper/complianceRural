@@ -21,6 +21,9 @@ public interface AtividadeRequisitoItemRepository extends JpaRepository<Atividad
     List<AtividadeRequisitoItem> findByAtividadeRequisitoIdAndRelatorioId(@Param("atividadeRequisitoId") Long atividadeRequisitoId,
                                                                            @Param("relatorioId") Long relatorioId);
     
+    @Query("SELECT ari FROM AtividadeRequisitoItem ari JOIN Relatorio r ON ari.relatorioId = r.id WHERE r.usuarioId = :usuarioId")
+    List<AtividadeRequisitoItem> findByUsuarioId(@Param("usuarioId") Long usuarioId);
+    
     @Query("SELECT ari FROM AtividadeRequisitoItem ari JOIN AtividadeRequisito ar ON ari.atividadeRequisitoId = ar.id WHERE ar.atividadeId = :atividadeId")
     List<AtividadeRequisitoItem> findByAtividadeId(@Param("atividadeId") Long atividadeId);
 }

@@ -80,6 +80,20 @@ public class AtividadeRequisitoItemController {
         }
     }
 
+    @GetMapping("/usuario/{usuarioId}")
+    @Transactional(readOnly = true)
+    public List<AtividadeRequisitoItemSemDocumentoDTO> findByUsuarioId(@PathVariable Long usuarioId) {
+        try {
+            List<AtividadeRequisitoItem> items = atividadeRequisitoItemService.findByUsuarioId(usuarioId);
+            
+            return items.stream()
+                    .map(this::toSemDocumentoDTO)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to find atividade requisito items by usuario id: " + usuarioId, e);
+        }
+    }
+
     @GetMapping("/{id}")
     public AtividadeRequisitoItem findById(@PathVariable Long id) {
         try {
