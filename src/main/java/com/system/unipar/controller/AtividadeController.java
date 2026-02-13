@@ -56,5 +56,31 @@ public class AtividadeController {
             throw new RuntimeException("Failed to find atividade by id: " + id, e);
         }
     }
+
+    @PutMapping("/{id}")
+    public AtividadeDTO update(@PathVariable Long id, @RequestBody AtividadeDTO atividadeDTO) {
+        if (atividadeDTO == null) {
+            throw new IllegalArgumentException("AtividadeDTO cannot be null");
+        }
+        try {
+            Atividade atividade = new Atividade();
+            atividade.setNome(atividadeDTO.getNome());
+            atividade.setDescricao(atividadeDTO.getDescricao());
+            
+            Atividade updatedAtividade = atividadeService.update(id, atividade);
+            
+            if (updatedAtividade == null) {
+                throw new RuntimeException("Atividade não encontrada para atualização com ID: " + id);
+            }
+            
+            return AtividadeDTO.builder()
+                    .id(updatedAtividade.getId())
+                    .nome(updatedAtividade.getNome())
+                    .descricao(updatedAtividade.getDescricao())
+                    .build();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update atividade with id: " + id, e);
+        }
+    }
 }
 
