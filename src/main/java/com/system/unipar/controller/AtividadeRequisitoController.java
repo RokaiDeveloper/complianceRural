@@ -60,7 +60,7 @@ public class AtividadeRequisitoController {
         atividadeRequisito.setCheckable(atividadeRequisitoDTO.getNome() != null && !atividadeRequisitoDTO.getNome().isEmpty());
         atividadeRequisito.setDataDocumento(atividadeRequisitoDTO.getDescricao() != null && !atividadeRequisitoDTO.getDescricao().isEmpty());
         atividadeRequisito.setDocumentoUpload(atividadeRequisitoDTO.isChecked());
-        atividadeRequisito.setObrigatorio(atividadeRequisitoDTO.isChecked());
+        atividadeRequisito.setDescricaoRequisito(atividadeRequisitoDTO.isChecked());
         return atividadeRequisito;
     }
 }

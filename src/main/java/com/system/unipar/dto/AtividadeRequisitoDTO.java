@@ -15,10 +15,11 @@ public class AtividadeRequisitoDTO {
     
     private Long atividadeId;
     
-    private String nome;
+    private boolean checkable;
     
-    private String descricao;
+    private boolean dataDocumento;
     
-    private boolean checked;
-    
+    private boolean documentoUpload;
+
+    private String descricaoRequisito;
 }
