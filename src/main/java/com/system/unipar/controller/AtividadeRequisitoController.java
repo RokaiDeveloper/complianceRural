@@ -54,6 +54,27 @@ public class AtividadeRequisitoController {
         }
     }
 
+    @GetMapping("/atividade/{atividadeId}")
+    public List<AtividadeRequisito> findByAtividadeId(@PathVariable Long atividadeId) {
+        try {
+            return atividadeRequisitoService.findByAtividadeId(atividadeId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to find atividade requisitos by atividade id: " + atividadeId, e);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public boolean deleteById(@PathVariable Long id) {
+        try {
+            if (id == null || id <= 0) {
+                throw new IllegalArgumentException("ID inválido fornecido: " + id);
+            }
+            return atividadeRequisitoService.deleteById(id);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete atividade requisito with id: " + id, e);
+        }
+    }
+
     private static AtividadeRequisito getAtividadeRequisito(AtividadeRequisitoDTO atividadeRequisitoDTO) {
         AtividadeRequisito atividadeRequisito = new AtividadeRequisito();
         atividadeRequisito.setAtividadeId(atividadeRequisitoDTO.getAtividadeId());
